@@ -1,0 +1,19 @@
+# Ignore user-specific or system-local files
+.local/
+.cache/
+.history
+*.swp
+
+# Ignore logs and temporary build files
+*.log
+*.pyc
+*.o
+
+# Ignore third-party repositories and lazyvim internal git
+repos/
+nvim/.config/nvim/.git/
+
+# Ignore system trash and desktop-specific files
+.Trash-*/
+.DS_Store
+
