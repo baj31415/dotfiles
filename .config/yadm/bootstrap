@@ -1,0 +1,65 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "🔧 Starting dotfiles bootstrap (Zsh + LazyVim)..."
+
+USER_NAME=$(whoami)
+
+# Install Zsh
+if ! command -v zsh &> /dev/null; then
+  echo "📥 Installing Zsh..."
+  sudo apt update
+  sudo apt install -y zsh
+else
+  echo "✅ Zsh is already installed."
+fi
+
+# Make Zsh default shell
+if [ "$SHELL" != "$(command -v zsh)" ]; then
+  echo "💡 Changing default shell to Zsh..."
+  chsh -s "$(command -v zsh)"
+fi
+
+# Install Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "📥 Installing Oh My Zsh..."
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+# Zsh plugins
+ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
+mkdir -p "$ZSH_CUSTOM/plugins"
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+fi
+
+# Install Neovim
+if ! command -v nvim &> /dev/null; then
+  echo "📥 Installing Neovim..."
+  sudo apt install -y neovim
+else
+  echo "✅ Neovim is already installed."
+fi
+
+# Setup LazyVim
+NVIM_CONFIG="$HOME/.config/nvim"
+if [ ! -d "$NVIM_CONFIG" ]; then
+  echo "📥 Cloning LazyVim starter..."
+  git clone https://github.com/LazyVim/starter "$NVIM_CONFIG"
+
+  cd "$NVIM_CONFIG"
+  sed -i "s/lazyvim/$USER_NAME/g" init.lua
+  mv lua/lazyvim lua/$USER_NAME
+
+  echo "✅ LazyVim customized for user: $USER_NAME"
+else
+  echo "✅ Neovim config already exists."
+fi
+
+echo "🎉 Bootstrap complete. Restart terminal or run \`zsh\`."
+
