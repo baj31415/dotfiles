@@ -10,9 +10,17 @@ echo "🔧 Installing packages with apt..."
 sudo apt update
 sudo apt install -y \
   git curl unzip \
-  zsh tmux stow neovim \
+  zsh tmux stow \
   ripgrep fd-find build-essential \
   dconf-cli gnome-terminal
+
+#neovim with appimage
+mkdir -p ~/dev/repos && cd ~/dev/repos
+curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+chmod u+x nvim-linux-x86_64.appimage
+
+sudo mkdir -p /opt/nvim
+sudo mv nvim-linux-x86_64.appimage /opt/nvim/nvim
 
 # ------------------------------------
 # STEP 2: Install Oh My Zsh
@@ -20,7 +28,7 @@ sudo apt install -y \
 echo "🐚 Installing Oh My Zsh..."
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   RUNZSH=no KEEP_ZSHRC=yes \
-  bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
   echo "✅ Oh My Zsh already installed."
 fi
@@ -62,7 +70,10 @@ echo "🔤 Installing JetBrainsMono Nerd Font..."
 # ------------------------------------
 # STEP 5: Clone LazyVim into dotfiles
 # ------------------------------------
-DOTFILES_DIR="$(cd "$(dirname "$0")"; pwd)"
+DOTFILES_DIR="$(
+  cd "$(dirname "$0")"
+  pwd
+)"
 LOCAL_NVIM_DIR="$DOTFILES_DIR/nvim/.config/nvim"
 
 if [ ! -d "$LOCAL_NVIM_DIR" ]; then
@@ -119,7 +130,7 @@ export INSTALL_PROFILE="Default"
 export INSTALL_SCHEME="Dracula"
 export CONFIRM="YES"
 
-bash install.sh <<< "$(echo -e "1\n1\nYES")" >/dev/null 2>&1 || echo "⚠️ Dracula install script may have failed. Check terminal manually."
+bash install.sh <<<"$(echo -e "1\n1\nYES")" >/dev/null 2>&1 || echo "⚠️ Dracula install script may have failed. Check terminal manually."
 
 cd "$DOTFILES_DIR"
 
@@ -148,4 +159,3 @@ fi
 echo "✅ All done!"
 echo "📎 Open GNOME Terminal → Preferences → confirm 'Dracula' is default."
 echo "🔁 Restart terminal and run: 'zsh' and 'nvim'"
-
